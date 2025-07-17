@@ -1,0 +1,9 @@
+{
+    "identifier": "com.inn.pliap",
+    "bundle": {
+        "android": {
+            "minSdkVersion": 24,
+            "versionCode": 100001
+        }
+    }
+}
