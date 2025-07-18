@@ -15,3 +15,7 @@ node_modules/
 
 dist-js
 dist
+
+
+keystore.properties
+*.jks
