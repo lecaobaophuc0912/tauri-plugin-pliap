@@ -1,9 +1,21 @@
 {
     "identifier": "com.inn.pliap",
+    "build": {
+        "beforeDevCommand": "yarn dev",
+        "beforeBuildCommand": "yarn build",
+        "devUrl": "http://localhost:1420",
+        "frontendDist": "../dist"
+    },
+    "app": {
+        "withGlobalTauri": false,
+        "security": {
+            "csp": null
+        }
+    },
     "bundle": {
         "android": {
             "minSdkVersion": 24,
-            "versionCode": 100001
+            "versionCode": 100002
         }
     }
 }

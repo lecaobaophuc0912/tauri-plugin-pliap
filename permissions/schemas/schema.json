@@ -295,6 +295,90 @@
       "type": "string",
       "oneOf": [
         {
+          "description": "Enables the consume command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-consume",
+          "markdownDescription": "Enables the consume command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the consume command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-consume",
+          "markdownDescription": "Denies the consume command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the create_purchase command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-create-purchase",
+          "markdownDescription": "Enables the create_purchase command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the create_purchase command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-create-purchase",
+          "markdownDescription": "Denies the create_purchase command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the create_purchase_subscription command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-create-purchase-subscription",
+          "markdownDescription": "Enables the create_purchase_subscription command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the create_purchase_subscription command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-create-purchase-subscription",
+          "markdownDescription": "Denies the create_purchase_subscription command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the get_all_purchases command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-get-all-purchases",
+          "markdownDescription": "Enables the get_all_purchases command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the get_all_purchases command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-get-all-purchases",
+          "markdownDescription": "Denies the get_all_purchases command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the get_list_subscription command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-get-list-subscription",
+          "markdownDescription": "Enables the get_list_subscription command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the get_list_subscription command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-get-list-subscription",
+          "markdownDescription": "Denies the get_list_subscription command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the get_product command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-get-product",
+          "markdownDescription": "Enables the get_product command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the get_product command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-get-product",
+          "markdownDescription": "Denies the get_product command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the get_subscription command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-get-subscription",
+          "markdownDescription": "Enables the get_subscription command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the get_subscription command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-get-subscription",
+          "markdownDescription": "Denies the get_subscription command without any pre-configured scope."
+        },
+        {
           "description": "Enables the ping command without any pre-configured scope.",
           "type": "string",
           "const": "allow-ping",

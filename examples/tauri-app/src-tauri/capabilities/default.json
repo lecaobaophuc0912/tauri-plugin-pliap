@@ -7,6 +7,13 @@
   ],
   "permissions": [
     "core:default",
-    "pliap:default"
+    "pliap:default",
+    "pliap:allow-create-purchase",
+    "pliap:allow-get-all-purchases",
+    "pliap:allow-get-product",
+    "pliap:allow-consume",
+    "pliap:allow-get-subscription",
+    "pliap:allow-get-list-subscription",
+    "pliap:allow-create-purchase-subscription"
   ]
 }

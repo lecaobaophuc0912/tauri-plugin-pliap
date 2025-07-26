@@ -8,20 +8,22 @@
     "build": "vite build",
     "preview": "vite preview",
     "tauri": "tauri",
-    "android": "tauri android dev",
-    "build-android-apk:prod": "yarn format && tsc && vite build && yarn tauri android build --config src-tauri/tauri.android.conf.json --apk"
+    "android": "tauri android dev --config src-tauri/tauri.android.conf.json",
+    "build-android-apk:prod": "yarn tauri android build --config src-tauri/tauri.android.conf.json --apk",
+    "build-android-aab:prod": "yarn tauri android build --config src-tauri/tauri.android.conf.json --aab"
   },
   "dependencies": {
     "@tauri-apps/api": "^2.0.0",
-    "tauri-plugin-pliap-api": "file:../../",
     "react": "^18.0.0",
-    "react-dom": "^18.0.0"
+    "react-dom": "^18.0.0",
+    "tauri-plugin-pliap-api": "file:../../"
   },
   "devDependencies": {
-    "vite": "^6.0.0",
     "@tauri-apps/cli": "^2.0.0",
-    "@vitejs/plugin-react": "^4.0.0",
     "@types/react": "^18.0.0",
-    "@types/react-dom": "^18.0.0"
+    "@types/react-dom": "^18.0.0",
+    "@vitejs/plugin-react": "^4.0.0",
+    "concurrently": "^9.2.0",
+    "vite": "^6.0.0"
   }
 }

@@ -1,8 +1,8 @@
 import XCTest
-@testable import ExamplePlugin
+@testable import BillingPlugin
 
-final class ExamplePluginTests: XCTestCase {
+final class BillingPluginTests: XCTestCase {
     func testExample() throws {
-        let plugin = ExamplePlugin()
+        let plugin = BillingPlugin()
     }
 }

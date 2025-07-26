@@ -1,6 +1,6 @@
 use tauri::{
-  plugin::{Builder, TauriPlugin},
-  Manager, Runtime,
+    plugin::{Builder, TauriPlugin},
+    Manager, Runtime,
 };
 
 pub use models::*;
@@ -23,26 +23,35 @@ use mobile::Pliap;
 
 /// Extensions to [`tauri::App`], [`tauri::AppHandle`] and [`tauri::Window`] to access the pliap APIs.
 pub trait PliapExt<R: Runtime> {
-  fn pliap(&self) -> &Pliap<R>;
+    fn pliap(&self) -> &Pliap<R>;
 }
 
 impl<R: Runtime, T: Manager<R>> crate::PliapExt<R> for T {
-  fn pliap(&self) -> &Pliap<R> {
-    self.state::<Pliap<R>>().inner()
-  }
+    fn pliap(&self) -> &Pliap<R> {
+        self.state::<Pliap<R>>().inner()
+    }
 }
 
 /// Initializes the plugin.
 pub fn init<R: Runtime>() -> TauriPlugin<R> {
-  Builder::new("pliap")
-    .invoke_handler(tauri::generate_handler![commands::ping])
-    .setup(|app, api| {
-      #[cfg(mobile)]
-      let pliap = mobile::init(app, api)?;
-      #[cfg(desktop)]
-      let pliap = desktop::init(app, api)?;
-      app.manage(pliap);
-      Ok(())
-    })
-    .build()
+    Builder::new("pliap")
+        .invoke_handler(tauri::generate_handler![
+            commands::ping,
+            commands::create_purchase,
+            commands::consume,
+            commands::get_product,
+            commands::get_all_purchases,
+            commands::get_subscription,
+            commands::get_list_subscription,
+            commands::create_purchase_subscription,
+        ])
+        .setup(|app, api| {
+            #[cfg(mobile)]
+            let pliap = mobile::init(app, api)?;
+            #[cfg(desktop)]
+            let pliap = desktop::init(app, api)?;
+            app.manage(pliap);
+            Ok(())
+        })
+        .build()
 }
