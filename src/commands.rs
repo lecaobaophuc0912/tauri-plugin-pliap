@@ -23,7 +23,7 @@ pub(crate) async fn create_purchase<R: Runtime>(
 #[command]
 pub(crate) async fn create_purchase_subscription<R: Runtime>(
     app: AppHandle<R>,
-    payload: PurchaseRequest,
+    payload: SubscriptionPurchaseRequest,
 ) -> Result<SubscriptionPurchaseResponse> {
     app.pliap().create_purchase_subscription(payload)
 }

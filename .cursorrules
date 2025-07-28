@@ -1,0 +1,327 @@
+# Cursor Rules for Tauri Plugin PLIAP
+
+## Project Overview
+
+This is a Tauri plugin for in-app purchases (PLIAP) that supports both desktop and mobile platforms (Android/iOS).
+
+## Code Organization & Structure
+
+### Rust Code Structure
+
+- `src/lib.rs` - Main plugin entry point and exports
+- `src/commands.rs` - Tauri command implementations
+- `src/models.rs` - Data structures and types
+- `src/error.rs` - Error handling and custom error types
+- `src/desktop.rs` - Desktop-specific implementations
+- `src/mobile.rs` - Mobile-specific implementations
+
+### Platform-Specific Code
+
+- `android/` - Android-specific Kotlin code
+- `ios/` - iOS-specific Swift code
+- `guest-js/` - JavaScript/TypeScript client code
+
+### Examples
+
+- `examples/tauri-app/` - Example Tauri application demonstrating plugin usage
+
+## Cross-Platform Data Consistency Rules
+
+### CRITICAL: Multi-Layer Data Synchronization
+
+This is a Tauri plugin repository where ANY changes to data structures, interfaces, or commands MUST be synchronized across ALL layers:
+
+#### Data Flow Dependencies
+
+```
+guest-js/ (TypeScript interfaces)
+    ↓
+src/models.rs (Rust data structures)
+    ↓
+src/commands.rs (Rust command parameters/returns)
+    ↓
+android/ (Kotlin implementations)
+ios/ (Swift implementations)
+    ↓
+build.rs (Command registration)
+```
+
+#### Mandatory Synchronization Checklist
+
+When making ANY changes to:
+
+- **TypeScript interfaces** in `guest-js/`
+- **Rust data structures** in `src/models.rs`
+- **Command signatures** in `src/commands.rs`
+- **Native implementations** in `android/` or `ios/`
+- **New commands** or **modified commands**
+
+You MUST verify and update ALL of the following:
+
+1. **TypeScript Client (`guest-js/`)**
+
+   - Interface definitions
+   - Type exports
+   - Function signatures
+   - Error types
+
+2. **Rust Models (`src/models.rs`)**
+
+   - Struct definitions
+   - Serde attributes
+   - Type conversions
+   - Validation logic
+
+3. **Rust Commands (`src/commands.rs`)**
+
+   - Function signatures
+   - Parameter types
+   - Return types
+   - Error handling
+
+4. **Native Implementations**
+
+   - **Android (`android/`)**: Kotlin data classes, function signatures
+   - **iOS (`ios/`)**: Swift structs, function signatures
+
+5. **Build Configuration (`build.rs`)**
+
+   - Command registration
+   - Permission definitions
+   - Platform-specific configurations
+
+6. **Permissions (`permissions/`)**
+
+   - Command permissions
+   - Schema definitions
+   - ACL manifests
+
+7. **Examples (`examples/tauri-app/`)**
+   - Usage examples
+   - Type imports
+   - Function calls
+
+#### Data Type Consistency Rules
+
+- **Naming**: Use identical names across all platforms (following platform conventions)
+- **Structure**: Maintain same field structure and types
+- **Serialization**: Ensure proper serde attributes for cross-platform serialization
+- **Validation**: Implement consistent validation logic
+- **Error Handling**: Use consistent error types and messages
+
+#### Command Synchronization Rules
+
+- **Function Names**: Must match across Rust commands and native implementations
+- **Parameters**: Same parameter types and order
+- **Return Types**: Consistent return types across all layers
+- **Error Types**: Unified error handling approach
+
+#### Example Synchronization Pattern
+
+```rust
+// 1. Define in src/models.rs
+#[derive(Serialize, Deserialize)]
+pub struct PurchaseRequest {
+    pub product_id: String,
+    pub quantity: i32,
+}
+
+// 2. Use in src/commands.rs
+#[tauri::command]
+pub async fn create_purchase(
+    app_handle: tauri::AppHandle,
+    request: PurchaseRequest,
+) -> Result<PurchaseResponse, Error> {
+    // Implementation
+}
+
+// 3. Define in guest-js/index.ts
+export interface PurchaseRequest {
+    product_id: string;
+    quantity: number;
+}
+
+// 4. Implement in android/BillingPlugin.kt
+data class PurchaseRequest(
+    val productId: String,
+    val quantity: Int
+)
+
+// 5. Implement in ios/BillingPlugin.swift
+struct PurchaseRequest: Codable {
+    let productId: String
+    let quantity: Int
+}
+
+// 6. Register in build.rs
+// Ensure command is properly registered
+```
+
+#### Validation Checklist
+
+Before committing ANY changes, verify:
+
+- [ ] TypeScript interfaces match Rust structs
+- [ ] Command signatures are consistent across platforms
+- [ ] Native implementations use correct data types
+- [ ] Build configuration includes new commands
+- [ ] Permissions are properly defined
+- [ ] Examples are updated
+- [ ] Error handling is consistent
+- [ ] Serialization/deserialization works correctly
+
+## Development Guidelines
+
+### Rust Code Standards
+
+- Use `anyhow` for error handling in command implementations
+- Follow Rust naming conventions (snake_case for functions/variables, PascalCase for types)
+- Implement proper error types in `src/error.rs`
+- Use `serde` for serialization/deserialization
+- Add comprehensive documentation comments for public APIs
+
+### Command Implementation Pattern
+
+```rust
+#[tauri::command]
+pub async fn command_name(
+    app_handle: tauri::AppHandle,
+    // other parameters
+) -> Result<ResponseType, ErrorType> {
+    // Implementation
+}
+```
+
+### Error Handling
+
+- Use custom error types defined in `src/error.rs`
+- Return `Result<T, E>` from all command functions
+- Provide meaningful error messages
+- Handle platform-specific errors appropriately
+
+### Platform-Specific Code
+
+- Desktop: Implement in `src/desktop.rs`
+- Mobile: Implement in `src/mobile.rs` with platform detection
+- Use conditional compilation with `#[cfg(target_os = "...")]`
+
+### TypeScript/JavaScript Client
+
+- Maintain type safety with proper TypeScript definitions
+- Follow async/await patterns for command calls
+- Implement proper error handling on the client side
+- Use the plugin API consistently
+
+## Testing & Examples
+
+### Example Application
+
+- Keep `examples/tauri-app/` updated with latest plugin features
+- Demonstrate all major functionality
+- Include proper error handling examples
+- Show both desktop and mobile usage
+
+### Testing Strategy
+
+- Unit tests for Rust code
+- Integration tests for command functionality
+- Platform-specific tests for Android/iOS
+- Example app should serve as integration test
+
+## Build & Configuration
+
+### Cargo.toml
+
+- Maintain proper dependencies and versions
+- Include all necessary features for target platforms
+- Keep build scripts updated
+
+### Platform Configuration
+
+- Android: Maintain `android/` directory structure
+- iOS: Maintain `ios/` directory structure
+- Ensure proper permissions and capabilities
+
+## Documentation
+
+### Code Documentation
+
+- Document all public APIs with `///` comments
+- Include usage examples in documentation
+- Maintain README.md with setup and usage instructions
+- Document platform-specific requirements
+
+### API Documentation
+
+- Keep `permissions/` directory updated
+- Maintain schema definitions
+- Document command parameters and return types
+
+## Git Workflow
+
+### Commit Messages
+
+- Use conventional commit format
+- Include platform-specific tags when relevant
+- Reference issues/PRs when applicable
+
+### Branch Strategy
+
+- `main` - stable releases
+- `develop` - development branch
+- Feature branches for new functionality
+- Platform-specific branches when needed
+
+## Performance & Best Practices
+
+### Memory Management
+
+- Avoid unnecessary allocations in hot paths
+- Use proper ownership patterns in Rust
+- Minimize data copying between platforms
+
+### Async Operations
+
+- Use async/await consistently
+- Handle long-running operations properly
+- Implement proper cancellation patterns
+
+### Platform Integration
+
+- Follow platform-specific best practices
+- Handle platform differences gracefully
+- Implement proper fallbacks when possible
+
+## Security Considerations
+
+### Input Validation
+
+- Validate all command inputs
+- Sanitize data before processing
+- Implement proper access controls
+
+### Error Information
+
+- Don't expose sensitive information in error messages
+- Log errors appropriately for debugging
+- Handle authentication/authorization properly
+
+## Maintenance
+
+### Dependencies
+
+- Keep dependencies updated
+- Monitor for security vulnerabilities
+- Test thoroughly after dependency updates
+
+### Platform Updates
+
+- Stay current with Tauri updates
+- Monitor platform SDK changes
+- Update platform-specific code as needed
+
+### Code Quality
+
+- Use clippy for Rust code quality
+- Maintain consistent formatting
+- Regular code reviews and refactoring

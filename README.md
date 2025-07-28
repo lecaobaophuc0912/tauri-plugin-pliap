@@ -129,10 +129,34 @@ const response = await ping("test");
 // Create a one-time purchase
 const purchaseSuccess = await createPurchase("product_id_123");
 
-// Create a subscription purchase
+// Create a subscription purchase with default base plan
 const subscription = await createPurchaseSubscription("subscription_id_456");
 if (subscription?.success) {
   console.log("Subscription purchased:", subscription.purchaseToken);
+}
+
+// Create a subscription purchase with specific base plan
+const monthlySubscription = await createPurchaseSubscription({
+  productId: "subscription_id_456",
+  basePlanId: "monthly",
+});
+if (monthlySubscription?.success) {
+  console.log(
+    "Monthly subscription purchased:",
+    monthlySubscription.purchaseToken
+  );
+}
+
+// Create a subscription purchase with weekly base plan
+const weeklySubscription = await createPurchaseSubscription({
+  productId: "subscription_id_456",
+  basePlanId: "weekly",
+});
+if (weeklySubscription?.success) {
+  console.log(
+    "Weekly subscription purchased:",
+    weeklySubscription.purchaseToken
+  );
 }
 
 // Consume a purchase
@@ -167,9 +191,16 @@ Test the plugin connection and return a response.
 
 Create a one-time purchase for the specified product ID.
 
-#### `createPurchaseSubscription(productId: string): Promise<SubscriptionPurchaseResponse | null>`
+#### `createPurchaseSubscription(options: SubscriptionPurchaseOptions | string): Promise<SubscriptionPurchaseResponse | null>`
 
-Create a subscription purchase for the specified product ID.
+Create a subscription purchase for the specified product ID with optional base plan selection.
+
+**Parameters:**
+
+- `options`: Either a string (productId) or an object with:
+  - `productId`: The subscription product ID
+  - `basePlanId?`: The base plan ID (e.g., "monthly", "weekly", "yearly")
+  - `offerToken?`: Optional offer token for promotional offers
 
 #### `consume(purchaseToken: string): Promise<boolean | null>`
 
@@ -235,6 +266,42 @@ interface SubscriptionPurchaseResponse {
   isAutoRenewing?: boolean;
   pending?: boolean;
 }
+```
+
+#### `SubscriptionPurchaseOptions`
+
+```typescript
+interface SubscriptionPurchaseOptions {
+  productId: string;
+  basePlanId?: string;
+  offerToken?: string;
+}
+```
+
+#### `BasePlan`
+
+```typescript
+type BasePlan = {
+  basePlanId: string;
+  name: string;
+  price: string;
+  billingPeriod: string;
+  isDefault?: boolean;
+};
+```
+
+#### `SubscriptionProduct`
+
+```typescript
+type SubscriptionProduct = {
+  description: string;
+  name: string;
+  productId: string;
+  productType: string;
+  title: string;
+  price: string;
+  basePlans?: BasePlan[];
+};
 ```
 
 ## Contributing

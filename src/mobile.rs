@@ -39,7 +39,7 @@ impl<R: Runtime> Pliap<R> {
 
     pub fn create_purchase_subscription(
         &self,
-        payload: PurchaseRequest,
+        payload: SubscriptionPurchaseRequest,
     ) -> crate::Result<SubscriptionPurchaseResponse> {
         self.0
             .run_mobile_plugin("createPurchaseSubscription", payload)

@@ -1,6 +1,6 @@
 import React from 'react';
 import './Home.css';
-import { createPurchaseSubscription } from '../../../../dist-js/index';
+import { createPurchaseSubscription, getListSubscription } from '../../../../dist-js/index';
 
 function Home() {
     const products = [
@@ -95,9 +95,14 @@ function Home() {
 
     const handleBuyNow = async (product) => {
         console.log('Mua sản phẩm:', product.name + 1);
+        const subscription = await getListSubscription('easy');
+        console.log(subscription);
         // Thêm logic mua hàng ở đây
         try {
-            const data = await createPurchaseSubscription('easy');
+            const data = await createPurchaseSubscription({
+                productId: 'easy',
+                basePlanId: 'easy-weekly',
+            });
             console.log(data);
         } catch (error) {
             console.error(error);

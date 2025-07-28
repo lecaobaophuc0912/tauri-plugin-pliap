@@ -1,6 +1,5 @@
 import { invoke } from '@tauri-apps/api/core'
 
-
 type BillingProduct = {
   description: string;
   name: string;
@@ -23,6 +22,24 @@ type BillingPurchase = {
   signature: string;
   isAcknowledged: boolean;
   isAutoRenewing: boolean;
+};
+
+type BasePlan = {
+  basePlanId: string;
+  name: string;
+  price: string;
+  billingPeriod: string;
+  isDefault?: boolean;
+};
+
+type SubscriptionProduct = {
+  description: string;
+  name: string;
+  productId: string;
+  productType: string;
+  title: string;
+  price: string;
+  basePlans?: BasePlan[];
 };
 
 export async function ping(value: string): Promise<string | null> {
@@ -59,13 +76,25 @@ export interface SubscriptionPurchaseResponse {
   pending?: boolean;
 }
 
+export interface SubscriptionPurchaseOptions {
+  productId: string;
+  basePlanId?: string;
+  offerToken?: string;
+}
+
 export async function createPurchaseSubscription(
-  productId: string
+  options: SubscriptionPurchaseOptions | string
 ): Promise<SubscriptionPurchaseResponse | null> {
+  const payload = typeof options === 'string'
+    ? { productId: options }
+    : {
+      productId: options.productId,
+      basePlanId: options.basePlanId,
+      offerToken: options.offerToken,
+    };
+
   return await invoke<Partial<SubscriptionPurchaseResponse>>("plugin:pliap|create_purchase_subscription", {
-    payload: {
-      productId,
-    },
+    payload,
   }).then((r) => r.success ? {
     success: r.success,
     purchaseToken: r.purchaseToken,
@@ -104,19 +133,19 @@ export async function getAllPurchases(): Promise<BillingPurchase[]> {
   ).then((r) => r.purchases || []);
 }
 
-export async function getSubscription(productId: string): Promise<BillingProduct | null> {
-  return await invoke<{ products: BillingProduct[] }>(
+export async function getSubscription(productId: string): Promise<SubscriptionProduct | null> {
+  return await invoke<{ subscriptions: SubscriptionProduct[] }>(
     "plugin:pliap|get_subscription",
     {
       payload: {
         productId,
       },
     }
-  ).then((r) => r.products?.[0] || null);
+  ).then((r) => r.subscriptions?.[0] || null);
 }
 
-export async function getListSubscription(productIds: string[]): Promise<BillingProduct[]> {
-  return await invoke<{ subscriptions: BillingProduct[] }>(
+export async function getListSubscription(productIds: string[]): Promise<SubscriptionProduct[]> {
+  return await invoke<{ subscriptions: SubscriptionProduct[] }>(
     "plugin:pliap|get_list_subscription",
     {
       payload: {
