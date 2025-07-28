@@ -1,0 +1,42 @@
+# Source files
+src/
+guest-js/
+android/
+ios/
+examples/
+
+# Build artifacts
+target/
+Cargo.lock
+build.rs
+
+# Development files
+.git/
+.gitignore
+.idea/
+.DS_Store
+
+# Config files
+Cargo.toml
+rollup.config.js
+tsconfig.json
+
+# Lock files
+yarn.lock
+package-lock.json
+pnpm-lock.yaml
+
+# Permissions
+permissions/
+
+# Node modules
+node_modules/
+
+# IDE
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+Thumbs.db 
