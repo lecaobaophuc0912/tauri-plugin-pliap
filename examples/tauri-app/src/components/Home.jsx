@@ -1,6 +1,6 @@
 import React from 'react';
 import './Home.css';
-import { createPurchaseSubscription, getListSubscription } from '../../../../dist-js/index';
+import { createPurchase, consume, createPurchaseSubscription, getListSubscription } from '../../../../dist-js';
 
 function Home() {
     const products = [
@@ -93,16 +93,29 @@ function Home() {
         }).format(price);
     };
 
-    const handleBuyNow = async (product) => {
+    const handleBuySubscription = async (product) => {
         console.log('Mua sản phẩm:', product.name + 1);
-        const subscription = await getListSubscription('easy');
+        const subscription = await getListSubscription(['easy']);
         console.log(subscription);
         // Thêm logic mua hàng ở đây
         try {
             const data = await createPurchaseSubscription({
                 productId: 'easy',
-                basePlanId: 'easy-weekly',
+                basePlanId: 'easy-monthly',
             });
+            console.log(data);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const handleBuyNow = async (product) => {
+        console.log('Mua sản phẩm:', product.name + 1);
+        const productData = await getProduct('phone');
+        console.log(productData);
+        // Thêm logic mua hàng ở đây
+        try {
+            const data = await createPurchase('phone');
             console.log(data);
         } catch (error) {
             console.error(error);
@@ -171,6 +184,13 @@ function Home() {
                                     disabled={!product.inStock}
                                 >
                                     {product.inStock ? 'Mua ngay' : 'Hết hàng'}
+                                </button>
+                                <button
+                                    className={`buy-now-btn ${!product.inStock ? 'disabled' : ''} buy-subscription-btn`}
+                                    onClick={() => handleBuySubscription(product)}
+                                    disabled={!product.inStock}
+                                >
+                                    {product.inStock ? 'Mua gói' : 'Hết hàng'}
                                 </button>
                             </div>
                         </div>

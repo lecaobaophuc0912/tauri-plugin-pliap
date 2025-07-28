@@ -230,6 +230,7 @@
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s;
+    margin-bottom: 10px;
 }
 
 .buy-now-btn:hover:not(.disabled) {
@@ -241,6 +242,14 @@
     background: #ccc;
     cursor: not-allowed;
     transform: none;
+}
+
+.buy-subscription-btn {
+    width: 100%;
+    background: #27ae60;
+    color: white;
+    border: none;
+    padding: 12px;
 }
 
 /* Promotions */

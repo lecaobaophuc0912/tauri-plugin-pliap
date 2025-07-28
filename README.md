@@ -265,6 +265,10 @@ interface SubscriptionPurchaseResponse {
   orderId?: string;
   isAutoRenewing?: boolean;
   pending?: boolean;
+  basePlanId?: string;
+  offerToken?: string;
+  productId?: string;
+  price?: string;
 }
 ```
 

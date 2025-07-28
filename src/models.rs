@@ -64,6 +64,14 @@ pub struct SubscriptionPurchaseResponse {
     pub is_auto_renewing: Option<bool>,
     /// Whether the purchase is pending (for subscriptions)
     pub pending: Option<bool>,
+    /// The base plan ID for the subscription (e.g., "monthly", "weekly", "yearly")
+    pub base_plan_id: Option<String>,
+    /// The offer token for the subscription
+    pub offer_token: Option<String>,
+    /// The product ID of the purchased subscription
+    pub product_id: Option<String>,
+    /// The price of the subscription
+    pub price: Option<String>,
 }
 
 #[derive(Debug, Clone, Default, Deserialize, Serialize)]

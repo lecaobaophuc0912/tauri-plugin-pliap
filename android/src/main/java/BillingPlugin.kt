@@ -111,16 +111,8 @@ class BillingPlugin(private val activity: Activity) : Plugin(activity) {
                     println("Handling purchase..")
                     val purchase = purchases[0]
                     
-                    // Check if this is a subscription purchase
-                    if (purchase.products.any { productId ->
-                        // You might want to maintain a list of subscription product IDs
-                        // or check the product type from the purchase
-                        productId.contains("subscription") || productId.contains("subs")
-                    }) {
-                        handlePurchaseSubscription(purchase)
-                    } else {
-                        handlePurchase(purchase)
-                    }
+                    // Check product type by querying product details
+                    checkProductTypeAndHandlePurchase(purchase)
                 } else {
                     savedInvoke?.reject("billingResult: " + getBillingMessage(billingResult))
                 }
@@ -139,6 +131,67 @@ class BillingPlugin(private val activity: Activity) : Plugin(activity) {
                 // Try to restart the connection
             }
         })
+    }
+
+    /**
+     * Query product details to determine if it's a subscription and handle accordingly
+     */
+    private fun checkProductTypeAndHandlePurchase(purchase: Purchase) {
+        if (purchase.products.isEmpty()) {
+            savedInvoke?.reject("No products found in purchase")
+            return
+        }
+
+        val productId = purchase.products[0]
+        
+        // Query both INAPP and SUBS product types to determine the actual type
+        val inappQueryParams = getProductQueryParams(productId)
+        val subsQueryParams = getSubscriptionQueryParams(productId)
+        
+        var inappFound = false
+        var subsFound = false
+        
+        // Query INAPP products
+        billingClient.queryProductDetailsAsync(inappQueryParams) { billingResult, productDetailsList ->
+            if (billingResult.responseCode == BillingClient.BillingResponseCode.OK && productDetailsList.isNotEmpty()) {
+                inappFound = true
+                // If we found INAPP product, handle as regular purchase
+                handlePurchase(purchase)
+            } else {
+                // Try querying SUBS products
+                billingClient.queryProductDetailsAsync(subsQueryParams) { subsBillingResult, subsProductDetailsList ->
+                    if (subsBillingResult.responseCode == BillingClient.BillingResponseCode.OK && subsProductDetailsList.isNotEmpty()) {
+                        subsFound = true
+                        // If we found SUBS product, handle as subscription
+                        handlePurchaseSubscription(purchase)
+                    } else {
+                        // If neither found, fallback to checking product name
+                        if (productId.contains("subscription", ignoreCase = true) || 
+                            productId.contains("subs", ignoreCase = true)) {
+                            handlePurchaseSubscription(purchase)
+                        } else {
+                            handlePurchase(purchase)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Helper method to create subscription response object
+     */
+    private fun createSubscriptionResponse(purchase: Purchase, pending: Boolean = false): JSObject {
+        val ret = JSObject()
+        ret.put("success", true)
+        ret.put("purchaseToken", purchase.purchaseToken)
+        ret.put("orderId", purchase.orderId)
+        ret.put("isAutoRenewing", purchase.isAutoRenewing)
+        ret.put("pending", pending)
+        ret.put("productId", purchase.products[0])
+        // Note: basePlanId, offerToken, and price are not available in Purchase object
+        // They need to be retrieved from the original product details or stored separately
+        return ret
     }
 
     private fun handlePurchase(purchase: Purchase) {
@@ -269,32 +322,19 @@ class BillingPlugin(private val activity: Activity) : Plugin(activity) {
                 
                 billingClient.acknowledgePurchase(acknowledgePurchaseParams) { billingResult ->
                     if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
-                        val ret = JSObject()
-                        ret.put("success", true)
-                        ret.put("purchaseToken", purchase.purchaseToken)
-                        ret.put("orderId", purchase.orderId)
-                        ret.put("isAutoRenewing", purchase.isAutoRenewing)
+                        val ret = createSubscriptionResponse(purchase, false)
                         savedInvoke?.resolve(ret)
                     } else {
                         savedInvoke?.reject("acknowledgePurchase: " + getBillingMessage(billingResult))
                     }
                 }
             } else {
-                val ret = JSObject()
-                ret.put("success", true)
-                ret.put("purchaseToken", purchase.purchaseToken)
-                ret.put("orderId", purchase.orderId)
-                ret.put("isAutoRenewing", purchase.isAutoRenewing)
+                val ret = createSubscriptionResponse(purchase, false)
                 savedInvoke?.resolve(ret)
             }
         } else if (purchase.purchaseState == Purchase.PurchaseState.PENDING) {
             // Subscription is pending (e.g., waiting for payment confirmation)
-            val ret = JSObject()
-            ret.put("success", true)
-            ret.put("purchaseToken", purchase.purchaseToken)
-            ret.put("orderId", purchase.orderId)
-            ret.put("isAutoRenewing", purchase.isAutoRenewing)
-            ret.put("pending", true)
+            val ret = createSubscriptionResponse(purchase, true)
             savedInvoke?.resolve(ret)
         } else {
             savedInvoke?.reject("purchaseState: " + purchase.purchaseState)
