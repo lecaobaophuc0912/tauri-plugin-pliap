@@ -27,6 +27,13 @@ class SubscriptionListArgs {
 }
 
 @InvokeArg
+class SubscriptionPurchaseArgs {
+    var productId: String? = null
+    var basePlanId: String? = null
+    var offerToken: String? = null
+}
+
+@InvokeArg
 class PingArgs {
   var value: String? = null
 }
@@ -201,17 +208,31 @@ class BillingPlugin(private val activity: Activity) : Plugin(activity) {
         savedInvoke?.reject("New subscription request requested")
         savedInvoke = invoke
 
-        val args = invoke.parseArgs(PurchaseArgs::class.java)
+        val args = invoke.parseArgs(SubscriptionPurchaseArgs::class.java)
         val queryParams = getSubscriptionQueryParams(args.productId ?: "")
 
         billingClient.queryProductDetailsAsync(queryParams) { billingResult, productDetailsList ->
             if (billingResult.responseCode == BillingClient.BillingResponseCode.OK && productDetailsList.isNotEmpty()) {
                 val dets = productDetailsList[0]
                 
-                // For subscriptions, we need to specify the offer token
-                val offerToken = dets.subscriptionOfferDetails?.get(0)?.offerToken
+                // Find the appropriate offer token based on basePlanId
+                val offerToken = if (args.basePlanId != null) {
+                    // Look for the specific base plan
+                    dets.subscriptionOfferDetails?.find { offerDetail ->
+                        offerDetail.basePlanId == args.basePlanId
+                    }?.offerToken
+                } else {
+                    // Use the first available offer (default behavior)
+                    dets.subscriptionOfferDetails?.get(0)?.offerToken
+                }
+                
                 if (offerToken == null) {
-                    invoke.reject("No subscription offer available")
+                    val errorMsg = if (args.basePlanId != null) {
+                        "Base plan '${args.basePlanId}' not found for product '${args.productId}'"
+                    } else {
+                        "No subscription offer available for product '${args.productId}'"
+                    }
+                    invoke.reject(errorMsg)
                     return@queryProductDetailsAsync
                 }
 
@@ -382,6 +403,20 @@ class BillingPlugin(private val activity: Activity) : Plugin(activity) {
                         put("productType", dets.productType)
                         put("title", dets.title)
                         put("price", dets.subscriptionOfferDetails?.get(0)?.pricingPhases?.pricingPhaseList?.get(0)?.formattedPrice)
+                        
+                        // Add base plans information
+                        val basePlansArray = JSArray()
+                        dets.subscriptionOfferDetails?.forEach { offerDetail ->
+                            val basePlanObj = JSObject().apply {
+                                put("basePlanId", offerDetail.basePlanId)
+                                put("name", offerDetail.basePlanId) // You might want to map this to a display name
+                                put("price", offerDetail.pricingPhases.pricingPhaseList[0].formattedPrice)
+                                put("billingPeriod", offerDetail.pricingPhases.pricingPhaseList[0].billingPeriod)
+                                put("isDefault", offerDetail.basePlanId == dets.subscriptionOfferDetails?.get(0)?.basePlanId)
+                            }
+                            basePlansArray.put(basePlanObj)
+                        }
+                        put("basePlans", basePlansArray)
                     }
                     productsArray.put(productObj)
                 }
@@ -412,11 +447,25 @@ class BillingPlugin(private val activity: Activity) : Plugin(activity) {
                         put("productType", dets.productType)
                         put("title", dets.title)
                         put("price", dets.subscriptionOfferDetails?.get(0)?.pricingPhases?.pricingPhaseList?.get(0)?.formattedPrice)
+                        
+                        // Add base plans information
+                        val basePlansArray = JSArray()
+                        dets.subscriptionOfferDetails?.forEach { offerDetail ->
+                            val basePlanObj = JSObject().apply {
+                                put("basePlanId", offerDetail.basePlanId)
+                                put("name", offerDetail.basePlanId) // You might want to map this to a display name
+                                put("price", offerDetail.pricingPhases.pricingPhaseList[0].formattedPrice)
+                                put("billingPeriod", offerDetail.pricingPhases.pricingPhaseList[0].billingPeriod)
+                                put("isDefault", offerDetail.basePlanId == dets.subscriptionOfferDetails?.get(0)?.basePlanId)
+                            }
+                            basePlansArray.put(basePlanObj)
+                        }
+                        put("basePlans", basePlansArray)
                     }
                     productsArray.put(productObj)
                 }
 
-                ret.put("products", productsArray)
+                ret.put("subscriptions", productsArray)
                 invoke.resolve(ret)
             } else {
                 invoke.reject("queryProductDetailsAsync: " + getBillingMessage(billingResult))
