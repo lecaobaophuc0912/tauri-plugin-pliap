@@ -74,6 +74,10 @@ export interface SubscriptionPurchaseResponse {
   orderId?: string;
   isAutoRenewing?: boolean;
   pending?: boolean;
+  basePlanId?: string;
+  offerToken?: string;
+  productId?: string;
+  price?: string;
 }
 
 export interface SubscriptionPurchaseOptions {
@@ -101,6 +105,10 @@ export async function createPurchaseSubscription(
     orderId: r.orderId,
     isAutoRenewing: r.isAutoRenewing,
     pending: r.pending,
+    basePlanId: r.basePlanId,
+    offerToken: r.offerToken,
+    productId: r.productId,
+    price: r.price,
   } : null);
 }
 
