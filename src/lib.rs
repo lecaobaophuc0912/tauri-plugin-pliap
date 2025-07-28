@@ -38,12 +38,12 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
         .invoke_handler(tauri::generate_handler![
             commands::ping,
             commands::create_purchase,
+            commands::create_purchase_subscription,
             commands::consume,
             commands::get_product,
             commands::get_all_purchases,
             commands::get_subscription,
             commands::get_list_subscription,
-            commands::create_purchase_subscription,
         ])
         .setup(|app, api| {
             #[cfg(mobile)]
