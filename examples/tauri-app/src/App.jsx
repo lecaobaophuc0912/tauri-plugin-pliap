@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
-import { ping } from "tauri-plugin-pliap-api";
 import Home from './components/Home';
 import List from './components/List';
 import Profile from './components/Profile';
 import Navigation from './components/Navigation';
 import { env } from './lib/env';
+import { ping } from '../../../dist-js';
 
 function App() {
     const [activeTab, setActiveTab] = useState('home');
