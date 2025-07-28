@@ -1,6 +1,6 @@
 {
   "name": "tauri-plugin-pliap",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "author": "Phuc Le",
   "description": "Tauri plugin for in-app purchases and subscriptions",
   "keywords": [
