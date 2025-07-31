@@ -1,6 +1,6 @@
 [package]
 name = "tauri-plugin-pliap"
-version = "1.0.4"
+version = "1.0.5"
 authors = ["Phuc Le <lecaobaophuc0912@gmail.com>"]
 description = "Tauri plugin for in-app purchases and subscriptions supporting desktop and mobile platforms"
 license = "MIT"
@@ -11,7 +11,7 @@ keywords = ["tauri", "plugin", "in-app-purchase", "billing", "subscription"]
 categories = ["api-bindings", "gui", "web-programming"]
 edition = "2021"
 rust-version = "1.77.2"
-exclude = ["/examples", "/dist-js", "/guest-js", "/node_modules", "/android", "/ios"]
+exclude = ["/examples", "/dist-js", "/guest-js", "/node_modules"]
 links = "tauri-plugin-pliap"
 
 [dependencies]

@@ -156,3 +156,11 @@ MIT License - see [LICENSE](LICENSE) file for details.
 - 📖 [Documentation](https://github.com/lecaobaophuc0912/tauri-plugin-pliap)
 - 🐛 [Issues](https://github.com/lecaobaophuc0912/tauri-plugin-pliap/issues)
 - 💬 [Discussions](https://github.com/lecaobaophuc0912/tauri-plugin-pliap/discussions)
+
+## Publish
+
+cargo login <your-api-token>
+
+Publish test, not upload: cargo publish --dry-run
+
+cargo publish
