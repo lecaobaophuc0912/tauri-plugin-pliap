@@ -1,86 +1,53 @@
-![pliap](https://github.com/tauri-apps/plugins-workspace/raw/v2/plugins/pliap/banner.png)
+# Tauri Plugin PLIAP
 
-This plugin provides APIs for handling in-app purchases and subscriptions in Tauri applications, including product queries, purchase creation, consumption, and subscription management.
+[![Crates.io](https://img.shields.io/crates/v/tauri-plugin-pliap)](https://crates.io/crates/tauri-plugin-pliap)
+[![Crates.io](https://img.shields.io/crates/d/tauri-plugin-pliap)](https://crates.io/crates/tauri-plugin-pliap)
+[![License](https://img.shields.io/crates/l/tauri-plugin-pliap)](https://github.com/lecaobaophuc0912/tauri-plugin-pliap/blob/main/LICENSE)
 
-| Platform | Supported |
-| -------- | --------- |
-| Linux    | x         |
-| Windows  | x         |
-| macOS    | x         |
-| Android  | ✓         |
-| iOS      | x         |
+A Tauri plugin for handling in-app purchases and subscriptions across desktop and mobile platforms.
 
-## Install
+## Features
 
-_This plugin requires a Rust version of at least **1.77.2**_
+- ✅ **Cross-platform support**: Desktop (Windows, macOS, Linux) and Mobile (Android, iOS)
+- ✅ **In-app purchases**: One-time purchases with Google Play Billing and App Store
+- ✅ **Subscriptions**: Recurring subscriptions with multiple base plans
+- ✅ **Product management**: Query product information and pricing
+- ✅ **Purchase tracking**: Get all user purchases and consumption status
+- ✅ **TypeScript support**: Full type definitions for the JavaScript API
 
-There are three general methods of installation that we can recommend.
+## Platform Support
 
-1. Use crates.io and npm (easiest, and requires you to trust that our publishing pipeline worked)
-2. Pull sources directly from Github using git tags / revision hashes (most secure)
-3. Git submodule install this repo in your tauri project and then use file protocol to ingest the source (most secure, but inconvenient to use)
+| Platform | Status  | Notes                  |
+| -------- | ------- | ---------------------- |
+| Android  | ✅ Full | Google Play Billing v6 |
 
-Install the Core plugin by adding the following to your `Cargo.toml` file:
+> **ℹ️ Hiện tại plugin chỉ hỗ trợ Android. Hỗ trợ iOS và Desktop sẽ được cập nhật trong tương lai.**
 
-`src-tauri/Cargo.toml`
+## Installation
+
+### Rust (Cargo.toml)
 
 ```toml
 [dependencies]
-tauri-plugin-pliap = { git = "https://github.com/lecaobaophuc0912/tauri-plugin-pliap", branch = "v1" }
+tauri-plugin-pliap = "1.0.4"
 ```
 
-You can install the JavaScript Guest bindings using your preferred JavaScript package manager:
+### JavaScript/TypeScript
 
-> Note: Since most JavaScript package managers are unable to install packages from git monorepos we provide read-only mirrors of each plugin. This makes installation option 2 more ergonomic to use.
-
-```sh
-pnpm add tauri-plugin-pliap
-# or
-npm add tauri-plugin-pliap
+```bash
+npm install tauri-plugin-pliap
 # or
 yarn add tauri-plugin-pliap
-
-# alternatively with Git:
-pnpm add https://github.com/lecaobaophuc0912/tauri-plugin-pliap#v1
 # or
-npm add https://github.com/lecaobaophuc0912/tauri-plugin-pliap#v1
-# or
-yarn add https://github.com/lecaobaophuc0912/tauri-plugin-pliap#v1
+pnpm add tauri-plugin-pliap
 ```
 
-## Setting up
+## Quick Start
 
-### Android
-
-This plugin requires the following permissions to be added to your `AndroidManifest.xml` file:
-
-```xml
-<uses-permission android:name="com.android.vending.BILLING" />
-```
-
-For subscription functionality, you may also need:
-
-```xml
-<uses-permission android:name="android.permission.INTERNET" />
-```
-
-> **Note**: These are normal permissions that are automatically granted when the app is installed. No runtime permission requests are required from the user.
-
-### iOS
-
-For iOS in-app purchases, ensure your app is properly configured with:
-
-- Valid App Store Connect configuration
-- Product IDs configured in App Store Connect
-- Proper code signing and provisioning profiles
-
-## Usage
-
-First you need to register the core plugin with Tauri:
-
-`src-tauri/src/lib.rs`
+### 1. Register the plugin
 
 ```rust
+// src-tauri/src/main.rs
 fn main() {
     tauri::Builder::default()
         .plugin(tauri_plugin_pliap::init())
@@ -89,11 +56,10 @@ fn main() {
 }
 ```
 
-Then, grant the plugin the necessary permissions:
-
-`src-tauri/capabilities/default.json`
+### 2. Configure permissions
 
 ```json
+// src-tauri/capabilities/default.json
 {
   "permissions": [
     "core:default",
@@ -109,211 +75,92 @@ Then, grant the plugin the necessary permissions:
 }
 ```
 
-Afterwards all the plugin's APIs are available through the JavaScript guest bindings:
+### 3. Use in your app
 
-```javascript
-import {
-  ping,
-  createPurchase,
-  createPurchaseSubscription,
-  consume,
-  getProduct,
-  getAllPurchases,
-  getSubscription,
-  getListSubscription,
-} from "@tauri-apps/plugin-pliap";
+```typescript
+import { createPurchase, getProduct } from "tauri-plugin-pliap";
 
-// Test connection
-const response = await ping("test");
+// Create a purchase
+const success = await createPurchase("product_id_123");
 
-// Create a one-time purchase
-const purchaseSuccess = await createPurchase("product_id_123");
-
-// Create a subscription purchase with default base plan
-const subscription = await createPurchaseSubscription("subscription_id_456");
-if (subscription?.success) {
-  console.log("Subscription purchased:", subscription.purchaseToken);
-}
-
-// Create a subscription purchase with specific base plan
-const monthlySubscription = await createPurchaseSubscription({
-  productId: "subscription_id_456",
-  basePlanId: "monthly",
-});
-if (monthlySubscription?.success) {
-  console.log(
-    "Monthly subscription purchased:",
-    monthlySubscription.purchaseToken
-  );
-}
-
-// Create a subscription purchase with weekly base plan
-const weeklySubscription = await createPurchaseSubscription({
-  productId: "subscription_id_456",
-  basePlanId: "weekly",
-});
-if (weeklySubscription?.success) {
-  console.log(
-    "Weekly subscription purchased:",
-    weeklySubscription.purchaseToken
-  );
-}
-
-// Consume a purchase
-const consumed = await consume("purchase_token_here");
-
-// Get product information
+// Get product info
 const product = await getProduct("product_id_123");
-if (product) {
-  console.log("Product:", product.title, "Price:", product.price);
-}
-
-// Get all user purchases
-const purchases = await getAllPurchases();
-console.log("User purchases:", purchases);
-
-// Get subscription information
-const subscriptionInfo = await getSubscription("subscription_id_456");
-
-// Get multiple subscriptions
-const subscriptions = await getListSubscription(["sub_1", "sub_2", "sub_3"]);
+console.log("Product:", product.title, "Price:", product.price);
 ```
 
 ## API Reference
 
-### Functions
+### Core Functions
 
-#### `ping(value: string): Promise<string | null>`
+- `ping(value: string)` - Test plugin connection
+- `createPurchase(productId: string)` - Create one-time purchase
+- `createPurchaseSubscription(options)` - Create subscription
+- `consume(purchaseToken: string)` - Consume a purchase
+- `getProduct(productId: string)` - Get product information
+- `getAllPurchases()` - Get all user purchases
+- `getSubscription(productId: string)` - Get subscription info
+- `getListSubscription(productIds: string[])` - Get multiple subscriptions
 
-Test the plugin connection and return a response.
-
-#### `createPurchase(productId: string): Promise<boolean | null>`
-
-Create a one-time purchase for the specified product ID.
-
-#### `createPurchaseSubscription(options: SubscriptionPurchaseOptions | string): Promise<SubscriptionPurchaseResponse | null>`
-
-Create a subscription purchase for the specified product ID with optional base plan selection.
-
-**Parameters:**
-
-- `options`: Either a string (productId) or an object with:
-  - `productId`: The subscription product ID
-  - `basePlanId?`: The base plan ID (e.g., "monthly", "weekly", "yearly")
-  - `offerToken?`: Optional offer token for promotional offers
-
-#### `consume(purchaseToken: string): Promise<boolean | null>`
-
-Consume a purchase using its purchase token.
-
-#### `getProduct(productId: string): Promise<BillingProduct | null>`
-
-Get product information for the specified product ID.
-
-#### `getAllPurchases(): Promise<BillingPurchase[]>`
-
-Get all purchases made by the user.
-
-#### `getSubscription(productId: string): Promise<BillingProduct | null>`
-
-Get subscription information for the specified product ID.
-
-#### `getListSubscription(productIds: string[]): Promise<BillingProduct[]>`
-
-Get information for multiple subscription product IDs.
-
-### Types
-
-#### `BillingProduct`
+### Key Types
 
 ```typescript
-type BillingProduct = {
-  description: string;
-  name: string;
+interface BillingProduct {
   productId: string;
-  productType: string;
   title: string;
+  description: string;
   price: string;
-};
-```
+  productType: string;
+}
 
-#### `BillingPurchase`
-
-```typescript
-type BillingPurchase = {
-  developerPayload: string;
-  orderId?: string;
-  originalJson: string;
-  packageName: string;
-  products: string[];
-  purchaseState: number;
-  purchaseTime: number;
-  purchaseToken: string;
-  quantity: number;
-  signature: string;
-  isAcknowledged: boolean;
-  isAutoRenewing: boolean;
-};
-```
-
-#### `SubscriptionPurchaseResponse`
-
-```typescript
 interface SubscriptionPurchaseResponse {
   success: boolean;
   purchaseToken?: string;
   orderId?: string;
   isAutoRenewing?: boolean;
-  pending?: boolean;
-  basePlanId?: string;
-  offerToken?: string;
-  productId?: string;
-  price?: string;
 }
 ```
 
-#### `SubscriptionPurchaseOptions`
+## Platform Setup
 
-```typescript
-interface SubscriptionPurchaseOptions {
-  productId: string;
-  basePlanId?: string;
-  offerToken?: string;
-}
+### Android
+
+Add to `AndroidManifest.xml`:
+
+```xml
+<uses-permission android:name="com.android.vending.BILLING" />
+<uses-permission android:name="android.permission.INTERNET" />
 ```
 
-#### `BasePlan`
+### iOS
 
-```typescript
-type BasePlan = {
-  basePlanId: string;
-  name: string;
-  price: string;
-  billingPeriod: string;
-  isDefault?: boolean;
-};
-```
+Ensure your app has:
 
-#### `SubscriptionProduct`
+- Valid App Store Connect configuration
+- Product IDs configured in App Store Connect
+- Proper code signing and provisioning profiles
 
-```typescript
-type SubscriptionProduct = {
-  description: string;
-  name: string;
-  productId: string;
-  productType: string;
-  title: string;
-  price: string;
-  basePlans?: BasePlan[];
-};
-```
+## Examples
+
+See the [examples/tauri-app](./examples/tauri-app) directory for a complete working example.
 
 ## Contributing
 
-PRs accepted. Please make sure to read the Contributing Guide before making a pull request.
+Contributions are welcome! Please read our [Contributing Guide](CONTRIBUTING.md) before submitting a pull request.
 
 ## License
 
-Code: (c) 2015 - Present - The Tauri Programme within The Commons Conservancy.
+MIT License - see [LICENSE](LICENSE) file for details.
 
-MIT or MIT/Apache 2.0 where applicable.
+## Support
+
+- 📖 [Documentation](https://github.com/lecaobaophuc0912/tauri-plugin-pliap)
+- 🐛 [Issues](https://github.com/lecaobaophuc0912/tauri-plugin-pliap/issues)
+- 💬 [Discussions](https://github.com/lecaobaophuc0912/tauri-plugin-pliap/discussions)
+
+## Publish
+
+cargo login <your-api-token>
+
+Publish test, not upload: cargo publish --dry-run
+
+cargo publish

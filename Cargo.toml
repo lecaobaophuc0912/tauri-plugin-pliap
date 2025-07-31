@@ -1,8 +1,14 @@
 [package]
 name = "tauri-plugin-pliap"
-version = "0.1.0"
-authors = [ "You" ]
-description = ""
+version = "1.0.5"
+authors = ["Phuc Le <lecaobaophuc0912@gmail.com>"]
+description = "Tauri plugin for in-app purchases and subscriptions supporting desktop and mobile platforms"
+license = "MIT"
+repository = "https://github.com/lecaobaophuc0912/tauri-plugin-pliap"
+homepage = "https://github.com/lecaobaophuc0912/tauri-plugin-pliap"
+documentation = "https://github.com/lecaobaophuc0912/tauri-plugin-pliap"
+keywords = ["tauri", "plugin", "in-app-purchase", "billing", "subscription"]
+categories = ["api-bindings", "gui", "web-programming"]
 edition = "2021"
 rust-version = "1.77.2"
 exclude = ["/examples", "/dist-js", "/guest-js", "/node_modules"]
@@ -10,8 +16,12 @@ links = "tauri-plugin-pliap"
 
 [dependencies]
 tauri = { version = "2.6.2" }
-serde = "1.0"
+serde = { version = "1.0", features = ["derive"] }
 thiserror = "2"
+anyhow = "1.0"
 
 [build-dependencies]
 tauri-plugin = { version = "2.3.0", features = ["build"] }
+
+[dev-dependencies]
+tauri = { version = "2.6.2", features = ["devtools"] }
