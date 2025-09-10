@@ -1,4 +1,4 @@
-# Tauri Plugin PLIAP
+# Tauri Plugin PLIAP (DEPRECATE, NO LONGER MAINTAINED AND DEVELOPMENT)
 
 [![Crates.io](https://img.shields.io/crates/v/tauri-plugin-pliap)](https://crates.io/crates/tauri-plugin-pliap)
 [![Crates.io](https://img.shields.io/crates/d/tauri-plugin-pliap)](https://crates.io/crates/tauri-plugin-pliap)
