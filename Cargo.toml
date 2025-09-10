@@ -1,6 +1,6 @@
 [package]
 name = "tauri-plugin-pliap"
-version = "1.0.5"
+version = "1.0.6"
 authors = ["Phuc Le <lecaobaophuc0912@gmail.com>"]
 description = "Tauri plugin for in-app purchases and subscriptions supporting desktop and mobile platforms"
 license = "MIT"

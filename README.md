@@ -29,7 +29,7 @@ A Tauri plugin for handling in-app purchases and subscriptions across desktop an
 
 ```toml
 [dependencies]
-tauri-plugin-pliap = "1.0.4"
+tauri-plugin-pliap = "1.0.6"
 ```
 
 ### JavaScript/TypeScript
